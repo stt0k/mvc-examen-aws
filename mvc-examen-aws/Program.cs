@@ -12,24 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-try
+var secretsClient = new AmazonSecretsManagerClient(RegionEndpoint.USEast2);
+var response = await secretsClient.GetSecretValueAsync(new GetSecretValueRequest
 {
-    var secretsClient = new AmazonSecretsManagerClient(RegionEndpoint.USEast2);
-    var response = await secretsClient.GetSecretValueAsync(new GetSecretValueRequest
-    {
-        SecretId = "prod/conexion-mysql"
-    });
-    var secret = JsonSerializer.Deserialize<Dictionary<string, string>>(response.SecretString)!;
-    var connectionString = $"server={secret["host"]};port={secret["port"]};database=examen_zapatillas;uid={secret["username"]};pwd={secret["password"]}";
-    builder.Services.AddDbContext<ZapatillaContext>(options =>
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-}
-catch
-{
-    var connectionString = builder.Configuration.GetConnectionString("MySql");
-    builder.Services.AddDbContext<ZapatillaContext>(options =>
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-}
+    SecretId = "prod/conexion-mysql-examen"
+});
+var secret = JsonSerializer.Deserialize<Dictionary<string, string>>(response.SecretString)!;
+var connectionString = $"server={secret["host"]};port={secret["port"]};database=examen_zapatillas;uid={secret["username"]};pwd={secret["password"]}";
+builder.Services.AddDbContext<ZapatillaContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddScoped<ZapatillaRepository>();
 builder.Services.AddScoped<ZapatillaService>();
