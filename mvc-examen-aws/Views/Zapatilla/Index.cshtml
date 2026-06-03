@@ -1,0 +1,36 @@
+@model List<Zapatilla>
+
+<h2>Listado de Zapatillas</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva Zapatilla</a>
+</p>
+
+<div class="row">
+    @foreach (var zapatilla in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(zapatilla.Imagen))
+                {
+                    <img src="@zapatilla.Imagen" class="card-img-top" alt="@zapatilla.Nombre" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-white">Sin imagen</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@zapatilla.Nombre</h5>
+                    <p class="card-text">@zapatilla.Descripcion</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay zapatillas registradas.</div>
+}
